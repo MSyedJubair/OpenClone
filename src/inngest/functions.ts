@@ -8,3 +8,11 @@ export const helloWorld = inngest.createFunction(
     return { message: `Hello ${event.data.email}!` };
   },
 );
+
+export const aiTest = inngest.createFunction(
+  { id: "ai test" },
+  { event: "test/ai" },
+  async ({ event, step }) => {
+    const summirizer = createagen
+  }
+)
