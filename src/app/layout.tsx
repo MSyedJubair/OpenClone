@@ -3,6 +3,7 @@ import { Montserrat } from "next/font/google";
 import { TRPCReactProvider } from "@/trpc/client";
 import "./globals.css";
 import { SandPackCSS } from "@/components/sandpack-styles";
+import { Toaster } from "sonner";
 
 // const geistSans = Geist({
 //   variable: "--font-geist-sans",
@@ -36,7 +37,7 @@ export default function RootLayout({
       <body
         className={`${montserrat.className} antialiased`}
       >
-        <TRPCReactProvider>{children}</TRPCReactProvider>
+        <TRPCReactProvider><Toaster/>{children}</TRPCReactProvider>
       </body>
     </html>
   );

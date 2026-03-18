@@ -20,7 +20,7 @@ import {
 } from "lucide-react";
 import { useRouter } from "next/navigation";
 
-const LovableCloneDashboard = () => {
+const Home = () => {
   const [prompt, setPrompt] = useState("");
   const [isSidebarCollapsed, setIsSidebarCollapsed] = useState(false);
   const router = useRouter();
@@ -131,7 +131,7 @@ const LovableCloneDashboard = () => {
           <div className="p-4 border-t border-white/10 flex flex-col gap-4">
             <button
               onClick={() => setIsSidebarCollapsed(!isSidebarCollapsed)}
-              className="mx-auto p-2 rounded-lg hover:bg-white/5 text-zinc-500 hover:text-zinc-300 transition-colors"
+              className="flex items-center justify-end p-2 rounded-lg hover:bg-white/5 text-zinc-500 hover:text-zinc-300 transition-colors"
             >
               {isSidebarCollapsed ? (
                 <ChevronRight className="w-5 h-5" />
@@ -301,4 +301,4 @@ const LovableCloneDashboard = () => {
   );
 };
 
-export default LovableCloneDashboard;
+export default Home;
