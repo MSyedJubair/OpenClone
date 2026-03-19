@@ -1,3 +1,5 @@
+import { auth } from '@/lib/auth';
+import prisma from '@/lib/db';
 import { initTRPC } from '@trpc/server';
 
 /**
@@ -7,7 +9,14 @@ import { initTRPC } from '@trpc/server';
  */
 export const createTRPCContext = async (opts: { headers: Headers }) => {
   // const user = await auth(opts.headers);
-  return { userId: 'user_123' };
+  const session = await auth.api.getSession({
+    headers: opts.headers,
+  })
+  return {
+    prisma,
+    session,
+    user: session?.user ?? null,
+  };
 };
 
 // Avoid exporting the entire t-object

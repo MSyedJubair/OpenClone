@@ -33,7 +33,7 @@ export default function SignUp() {
         onSuccess: () => {
           setIsLoading(false);
           toast.success("Account created successfully!");
-          router.push("/dashboard"); // Redirect the user
+          router.push("/"); // Redirect the user
         },
         onError: (ctx) => {
           setIsLoading(false);

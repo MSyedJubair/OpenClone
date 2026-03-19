@@ -13,11 +13,13 @@ datasource db {
 }
 
 model Project {
-  id       Int    @id @default(autoincrement())
-  files    Json
-  chat     Chat?
-  author   User   @relation(fields: [authorId], references: [id])
-  authorId String
+  id          Int    @id @default(autoincrement())
+  name        String?
+  description String?
+  files       Json
+  chat        Chat?
+  author      User   @relation(fields: [authorId], references: [id])
+  authorId    String
 }
 
 model Chat {
@@ -53,12 +55,11 @@ model User {
   sessions      Session[]
   accounts      Account[]
 
+  // Project Specific
+  projects Project[]
+
   @@unique([email])
   @@map("user")
-
-  // Project Specific
-  projects Project[]  
-
 }
 
 model Session {

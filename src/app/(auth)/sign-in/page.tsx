@@ -10,7 +10,8 @@ import { Loader2 } from "lucide-react"; // Optional: for a nice spinner
 export default function SignIn() {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
-  const [isLoading, setIsLoading] = useState(false); // 1. Loading state
+  const [isLoading, setIsLoading] = useState(false); 
+
   const router = useRouter();
 
   const handleSignin = async () => {
@@ -23,8 +24,8 @@ export default function SignIn() {
       {
         email,
         password,
-        callbackURL: "/dashboard",
-        rememberMe: false,
+        callbackURL: "/",
+        rememberMe: true,
       },
       {
         // 2. Use callbacks for cleaner state management
@@ -34,7 +35,7 @@ export default function SignIn() {
         onSuccess: () => {
           setIsLoading(false);
           toast.success("Successfully Signed In");
-          router.push("/dashboard");
+          router.push("/");
         },
         onError: (ctx) => {
           setIsLoading(false);

@@ -1,15 +1,9 @@
-import React from "react";
+import React from 'react'
 
-const Projects = async ({ searchParams }) => {
-  const prompt = (await searchParams).prompt;
+const page = () => {
   return (
-    <div>
-      {prompt}
-      <div>
-        
-      </div>
-    </div>
-  );
-};
+    <div>page</div>
+  )
+}
 
-export default Projects;
+export default page
