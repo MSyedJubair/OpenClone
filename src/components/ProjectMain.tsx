@@ -26,10 +26,10 @@ const ProjectMain = () => {
   console.log("projectId:", projectId);
 
   const trpc = useTRPC();
-  const { data: project, isLoading } = useQuery(
+  const { data: project, isLoading, isFetching } = useQuery(
     trpc.project.getProject.queryOptions(
       { projectId: Number(projectId) },
-      { enabled: !!projectId && !isNaN(Number(projectId)) },
+      // { enabled: !!projectId && !isNaN(Number(projectId)) },
     ),
   );
 
@@ -84,7 +84,7 @@ const ProjectMain = () => {
       </header>
 
       {/* Editor */}
-      {!isLoading ? (
+      {!isLoading || !isFetching ? (
         <div className="flex-1 w-full overflow-hidden">
         <SandpackProvider
           template="react"

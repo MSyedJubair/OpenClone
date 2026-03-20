@@ -1,5 +1,5 @@
 "use client";
-import React, { useRef, useState } from "react";
+import React, { useCallback, useEffect, useRef, useState } from "react";
 import {
   ChevronLeft,
   ChevronRight,
@@ -7,21 +7,44 @@ import {
 import { useParams } from "next/navigation";
 import Chat from "./Chat";
 
-interface SidebarProps {
-  chatWidth: number;
-  isResizing: boolean;
-  startResizing: (e: React.MouseEvent) => void;
-}
-
-const ProjectSideBar = ({
-  chatWidth,
-  isResizing,
-  startResizing,
-}: SidebarProps) => {
+const ProjectSideBar = () => {
   const { projectId } = useParams();
 
   const sidebarRef = useRef(null);
   const [isChatOpen, setIsChatOpen] = useState(true);
+
+    // Resizing State
+    const [chatWidth, setChatWidth] = useState(400);
+    const [isResizing, setIsResizing] = useState(false);
+  
+    // Resizing Logic
+    const startResizing = useCallback(() => {
+      setIsResizing(true);
+    }, []);
+  
+    const stopResizing = useCallback(() => {
+      setIsResizing(false);
+    }, []);
+  
+    const resize = useCallback(
+      (e: MouseEvent) => {
+      if (isResizing) {
+        // Limit min width to 280 and max to 600
+        const newWidth = Math.min(Math.max(280, e.clientX), 800);
+        setChatWidth(newWidth);
+      }
+      },
+      [isResizing],
+    );
+  
+    useEffect(() => {
+      window.addEventListener("mousemove", resize);
+      window.addEventListener("mouseup", stopResizing);
+      return () => {
+        window.removeEventListener("mousemove", resize);
+        window.removeEventListener("mouseup", stopResizing);
+      };
+    }, [resize, stopResizing]);
 
   return (
     <aside

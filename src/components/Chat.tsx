@@ -17,7 +17,7 @@ const Chat = ({ chatWidth, projectId}: {chatWidth: number, projectId:string}) =>
   const messagesEndRef = useScrollToBottom<HTMLDivElement>([Chat?.length || 0]);
 
   // Ai
-  const { mutateAsync: generate, isPending: isAiGenerating, isError } = useMutation(trpc.Ai.getSummary.mutationOptions({
+  const { mutateAsync: generate, isPending: isAiGenerating } = useMutation(trpc.Ai.getSummary.mutationOptions({
     onSuccess: async () => {
       await queryClient.invalidateQueries({
         queryKey: trpc.project.getProject.queryKey({
@@ -27,6 +27,7 @@ const Chat = ({ chatWidth, projectId}: {chatWidth: number, projectId:string}) =>
     }
   }))
 
+  // Send message
   const { mutateAsync } = useMutation(
     trpc.project.sendMessage.mutationOptions({
       onSuccess: async () => {
@@ -85,20 +86,19 @@ const Chat = ({ chatWidth, projectId}: {chatWidth: number, projectId:string}) =>
     e.preventDefault();
     if (!chatInput.trim()) return;
 
-    const inpt = await mutateAsync({
-      text: chatInput,
+    const inpt = chatInput
+    setChatInput("");
+
+    await mutateAsync({
+      text: inpt,
       role: "User",
       projectId: Number(projectId),
     });
-
-    setChatInput("");
-
-    if (!inpt) return
     
     // Ai response
     // Run if its the first time - generate code
 
-    const res = await generate({ userReq: inpt?.text, projectId })
+    const res = await generate({ userReq: inpt, projectId })
 
     await mutateAsync({
       text: res.description,

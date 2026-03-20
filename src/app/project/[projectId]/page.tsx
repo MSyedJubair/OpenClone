@@ -1,47 +1,10 @@
-"use client";
-
-import React, { useState, useEffect, useCallback } from "react";
 import ProjectMain from "@/components/ProjectMain";
 import ProjectSideBar from "@/components/ProjectSideBar";
 
 export default function LovableClone() {
-  // Resizing State
-  const [chatWidth, setChatWidth] = useState(400);
-  const [isResizing, setIsResizing] = useState(false);
-
-  // Resizing Logic
-  const startResizing = useCallback((e) => {
-    setIsResizing(true);
-  }, []);
-
-  const stopResizing = useCallback(() => {
-    setIsResizing(false);
-  }, []);
-
-  const resize = useCallback(
-    (e) => {
-      if (isResizing) {
-        // Limit min width to 280 and max to 600
-        const newWidth = Math.min(Math.max(280, e.clientX), 800);
-        setChatWidth(newWidth);
-      }
-    },
-    [isResizing],
-  );
-
-  useEffect(() => {
-    window.addEventListener("mousemove", resize);
-    window.addEventListener("mouseup", stopResizing);
-    return () => {
-      window.removeEventListener("mousemove", resize);
-      window.removeEventListener("mouseup", stopResizing);
-    };
-  }, [resize, stopResizing]);
-  
-
   return (
     <div
-      className={`flex h-screen w-full bg-app-bg text-zinc-300 overflow-hidden selection:bg-indigo-500/30 font-sans ${isResizing ? "cursor-col-resize select-none" : ""}`}
+      className={`flex h-screen w-full bg-app-bg text-zinc-300 overflow-hidden selection:bg-indigo-500/30 font-sans `}
     >
       <style>{`
         @keyframes drift {
@@ -60,12 +23,8 @@ export default function LovableClone() {
         <div className="absolute -bottom-[10%] -right-[10%] w-[40%] h-[40%] bg-purple-500/10 rounded-full blur-[120px] animate-drift-slow" />
       </div>
 
-      {/* LEFT: Resizable & Collapsible Chat Panel */}
-      <ProjectSideBar
-        chatWidth={chatWidth}
-        isResizing={isResizing}
-        startResizing={startResizing}
-      />
+      {/* LEFT: Resizable & Collapsible Chat Panel} */}
+      <ProjectSideBar/>
 
       {/* RIGHT: Preview & Code Panel */}
       <ProjectMain />

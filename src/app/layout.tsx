@@ -4,6 +4,7 @@ import { TRPCReactProvider } from "@/trpc/client";
 import "./globals.css";
 import { SandPackCSS } from "@/components/sandpack-styles";
 import { Toaster } from "sonner";
+import SideBar from "@/components/SideBar";
 
 // const geistSans = Geist({
 //   variable: "--font-geist-sans",
@@ -16,8 +17,8 @@ import { Toaster } from "sonner";
 // });
 const montserrat = Montserrat({
   subsets: ["latin"],
-  variable: '--font-montserrat', 
-})
+  variable: "--font-montserrat",
+});
 
 export const metadata: Metadata = {
   title: "Create Next App",
@@ -34,10 +35,14 @@ export default function RootLayout({
       <head>
         <SandPackCSS />
       </head>
-      <body
-        className={`${montserrat.className} antialiased`}
-      >
-        <TRPCReactProvider><Toaster/>{children}</TRPCReactProvider>
+      <body className={`${montserrat.className} antialiased`}>
+        <TRPCReactProvider>
+          <Toaster />
+          <div className="flex flex-row w-full">
+            <SideBar />
+            {children}
+          </div>
+        </TRPCReactProvider>
       </body>
     </html>
   );
