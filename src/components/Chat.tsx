@@ -4,6 +4,7 @@ import { Spinner } from "./ui/spinner";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { useTRPC } from "@/trpc/client";
 import { useScrollToBottom } from "@/hooks/useScrollBottom";
+// import { SandpackFiles } from "@codesandbox/sandpack-react";
 
 const Chat = ({
   chatWidth,
@@ -109,7 +110,7 @@ const Chat = ({
     });
 
     if (Chat!.length > 1) {
-      const res = await editCode({ prevCode: JSON.stringify(project.files), userReq: input, projectId: projectId });
+      const res = await editCode({ prevCode: JSON.stringify(project!.files), userReq: input, projectId: projectId });
       await sendMessage({
         text: res.summary,
         role: "Ai",
