@@ -5,7 +5,13 @@ import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { useTRPC } from "@/trpc/client";
 import { useScrollToBottom } from "@/hooks/useScrollBottom";
 
-const Chat = ({ chatWidth, projectId }: { chatWidth: number; projectId: string }) => {
+const Chat = ({
+  chatWidth,
+  projectId,
+}: {
+  chatWidth: number;
+  projectId: string;
+}) => {
   const [chatInput, setChatInput] = useState("");
   const trpc = useTRPC();
   const queryClient = useQueryClient();
@@ -16,25 +22,48 @@ const Chat = ({ chatWidth, projectId }: { chatWidth: number; projectId: string }
 
   const messagesEndRef = useScrollToBottom<HTMLDivElement>([Chat?.length || 0]);
 
+  const { data: project } = useQuery(
+    trpc.project.getProject.queryOptions({ projectId: Number(projectId) })
+  );
+
   const { mutateAsync: generate, isPending: isAiGenerating } = useMutation(
     trpc.Ai.getSummary.mutationOptions({
       onSuccess: async () => {
         await queryClient.invalidateQueries({
-          queryKey: trpc.project.getProject.queryKey({ projectId: Number(projectId) })
+          queryKey: trpc.project.getProject.queryKey({
+            projectId: Number(projectId),
+          }),
         });
-      }
-    })
+      },
+    }),
   );
 
+  const { mutateAsync: editCode, isPending: isCodeEditing } = useMutation(
+    trpc.Ai.editCode.mutationOptions({
+      onSuccess: async () => {
+        await queryClient.invalidateQueries({
+          queryKey: trpc.project.getProject.queryKey({
+            projectId: Number(projectId),
+          }),
+        });
+      },
+    }),
+  );
+
+  // Send Msg
   const { mutateAsync: sendMessage } = useMutation(
     trpc.project.sendMessage.mutationOptions({
       onSuccess: async () => {
         await queryClient.invalidateQueries({
-          queryKey: trpc.project.getChatMessages.queryKey({ projectId: Number(projectId) }),
+          queryKey: trpc.project.getChatMessages.queryKey({
+            projectId: Number(projectId),
+          }),
         });
       },
       onMutate: async (newMessage) => {
-        const queryKey = trpc.project.getChatMessages.queryKey({ projectId: Number(projectId) });
+        const queryKey = trpc.project.getChatMessages.queryKey({
+          projectId: Number(projectId),
+        });
         await queryClient.cancelQueries({ queryKey });
         const previousMessages = queryClient.getQueryData(queryKey);
 
@@ -52,12 +81,16 @@ const Chat = ({ chatWidth, projectId }: { chatWidth: number; projectId: string }
         return { previousMessages };
       },
       onError: (err, newMessage, context) => {
-        const queryKey = trpc.project.getChatMessages.queryKey({ projectId: Number(projectId) });
+        const queryKey = trpc.project.getChatMessages.queryKey({
+          projectId: Number(projectId),
+        });
         queryClient.setQueryData(queryKey, context?.previousMessages);
       },
       onSettled: () => {
         queryClient.invalidateQueries({
-          queryKey: trpc.project.getChatMessages.queryKey({ projectId: Number(projectId) }),
+          queryKey: trpc.project.getChatMessages.queryKey({
+            projectId: Number(projectId),
+          }),
         });
       },
     }),
@@ -75,13 +108,22 @@ const Chat = ({ chatWidth, projectId }: { chatWidth: number; projectId: string }
       projectId: Number(projectId),
     });
 
-    const res = await generate({ userReq: input, projectId });
+    if (Chat!.length > 1) {
+      const res = await editCode({ prevCode: JSON.stringify(project.files), userReq: input, projectId: projectId });
+      await sendMessage({
+        text: res.summary,
+        role: "Ai",
+        projectId: Number(projectId),
+      });
+    } else {
+      const res = await generate({ userReq: input, projectId });
 
-    await sendMessage({
-      text: res.description,
-      role: "Ai",
-      projectId: Number(projectId),
-    });
+      await sendMessage({
+        text: res.description,
+        role: "Ai",
+        projectId: Number(projectId),
+      });
+    }
   };
 
   const handleKeyDown = (e: KeyboardEvent<HTMLTextAreaElement>) => {
@@ -123,11 +165,13 @@ const Chat = ({ chatWidth, projectId }: { chatWidth: number; projectId: string }
                 key={msg.id}
                 className={`flex gap-3 ${msg.role === "User" ? "flex-row-reverse" : "flex-row"}`}
               >
-                <div className={`w-8 h-8 rounded-lg border flex items-center justify-center shrink-0 ${
-                  msg.role === "Ai" 
-                    ? "bg-zinc-900 border-white/10" 
-                    : "bg-indigo-600 border-indigo-400/30"
-                }`}>
+                <div
+                  className={`w-8 h-8 rounded-lg border flex items-center justify-center shrink-0 ${
+                    msg.role === "Ai"
+                      ? "bg-zinc-900 border-white/10"
+                      : "bg-indigo-600 border-indigo-400/30"
+                  }`}
+                >
                   {msg.role === "Ai" ? (
                     <Sparkles size={14} className="text-indigo-400" />
                   ) : (
@@ -135,25 +179,29 @@ const Chat = ({ chatWidth, projectId }: { chatWidth: number; projectId: string }
                   )}
                 </div>
 
-                <div className={`flex flex-col max-w-[80%] ${msg.role === "User" ? "items-end" : "items-start"}`}>
-                  <div className={`px-4 py-2.5 rounded-2xl text-[14px] leading-relaxed ${
-                    msg.role === "User" 
-                      ? "bg-indigo-600 text-white rounded-tr-none" 
-                      : "bg-zinc-900 text-zinc-200 border border-white/5 rounded-tl-none"
-                  }`}>
+                <div
+                  className={`flex flex-col max-w-[80%] ${msg.role === "User" ? "items-end" : "items-start"}`}
+                >
+                  <div
+                    className={`px-4 py-2.5 rounded-2xl text-[14px] leading-relaxed ${
+                      msg.role === "User"
+                        ? "bg-indigo-600 text-white rounded-tr-none"
+                        : "bg-zinc-900 text-zinc-200 border border-white/5 rounded-tl-none"
+                    }`}
+                  >
                     {msg.text}
                   </div>
                 </div>
               </div>
             ))}
-            
-            {isAiGenerating && (
+
+            {isAiGenerating || isCodeEditing && (
               <div className="flex gap-3 animate-pulse">
                 <div className="w-8 h-8 rounded-lg bg-zinc-900 border border-white/10 flex items-center justify-center">
                   <Sparkles size={14} className="text-indigo-400" />
                 </div>
                 <div className="bg-zinc-900/50 border border-white/5 px-4 py-2.5 rounded-2xl rounded-tl-none">
-                  <Spinner  />
+                  <Spinner />
                 </div>
               </div>
             )}
@@ -176,9 +224,10 @@ const Chat = ({ chatWidth, projectId }: { chatWidth: number; projectId: string }
             onClick={handleSendMessage}
             disabled={!chatInput.trim() || isAiGenerating}
             className={`absolute right-2 bottom-2 p-2 rounded-lg transition-all active:scale-95 
-              ${!chatInput.trim() || isAiGenerating
-                ? "text-zinc-600 cursor-not-allowed"
-                : "text-white bg-indigo-600 hover:bg-indigo-500"
+              ${
+                !chatInput.trim() || isAiGenerating
+                  ? "text-zinc-600 cursor-not-allowed"
+                  : "text-white bg-indigo-600 hover:bg-indigo-500"
               }`}
           >
             <Send size={18} />
