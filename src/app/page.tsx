@@ -1,13 +1,22 @@
 import { LayoutDashboard, Zap, Clock, MoreVertical } from "lucide-react";
-import SideBar from "@/components/SideBar";
 import PromptInput from "@/components/PromptInput";
 import NewProject from "@/components/NewProject";
 import prisma from "@/lib/db";
 import Link from "next/link";
+import { headers } from 'next/headers'; 
 import { timeAgo } from "@/lib/utils";
+import { auth } from "@/lib/auth";
 
 const Home = async () => {
-  const recentProjects = await prisma.project.findMany({ take: 3 });
+  const user = await auth.api.getSession({
+    headers: await headers() 
+  })
+  const recentProjects = await prisma.project.findMany({
+    take: 3,
+    where: {
+      authorId: user?.user.id
+    }
+  });
 
   return (
     <>
