@@ -20,7 +20,7 @@ export const aiRouter = createTRPCRouter({
         model: "gemini-2.5-flash",
         systemInstruction: `
           You are an expert React developer. 
-          Generate a project structure for Sandpack. 
+          Generate a project structure for Sandpack using Tailwind CSS. 
 
           IMPORTANT: Return ONLY a valid JSON object. 
           Do not include explanations or markdown outside the JSON block.
@@ -36,7 +36,7 @@ export const aiRouter = createTRPCRouter({
             "description": "string",
             "files": {
                 "/App.js": "source code string",
-                "/styles.css": "css string"
+                "/components/header.ts": "header code string"
               }
           }
 

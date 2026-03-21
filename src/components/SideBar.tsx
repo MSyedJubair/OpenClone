@@ -7,9 +7,9 @@ import {
   FolderKanban,
   Settings,
   ChevronDown,
-  Globe,
   ChevronLeft,
   ChevronRight,
+  House,
 } from "lucide-react";
 import { useState } from "react";
 import { Spinner } from "./ui/spinner";
@@ -34,14 +34,13 @@ const SideBar = () => {
   const {
     data: User,
     isLoading,
-    isError,
   } = useQuery(trpc.user.getUser.queryOptions());
 
   // 3. Define navigation items for easier mapping
   const navItems = [
-    { label: "Overview", href: "/", icon: LayoutDashboard },
+    { label: "Overview", href: "/", icon: House },
     { label: "Projects", href: "/project", icon: FolderKanban },
-    { label: "Domains", href: "/domains", icon: Globe },
+    { label: "Dashboard", href: "/dashboard", icon: LayoutDashboard },
     { label: "Settings", href: "/settings", icon: Settings },
   ];
 
