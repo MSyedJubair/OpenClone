@@ -2,6 +2,7 @@ import z from "zod";
 import { createTRPCRouter } from "../init";
 import { protectedProcedure } from "./ProtectedProcedure";
 import { GoogleGenerativeAI } from "@google/generative-ai";
+import { inngest } from "@/inngest/client";
 
 const genAI = new GoogleGenerativeAI(process.env.GEMINI_API_KEY!);
 
@@ -16,9 +17,7 @@ export const aiRouter = createTRPCRouter({
       }),
     )
     .mutation(async ({ ctx, input }) => {
-      const model = genAI.getGenerativeModel({
-        model: "gemini-2.5-flash",
-        systemInstruction: `
+      const systemPrompt = `
           You are an expert React developer. 
           Generate a project structure for Sandpack using Tailwind CSS. 
 
@@ -41,7 +40,10 @@ export const aiRouter = createTRPCRouter({
           }
 
           Note: Ensure all code strings are properly escaped for JSON. Use double quotes for JSON keys/values and escape internal quotes in the code.
-        `,
+        `;
+      const model = genAI.getGenerativeModel({
+        model: "gemini-2.5-flash",
+        systemInstruction: systemPrompt,
       });
       const result = await model.generateContent({
         contents: [{ role: "user", parts: [{ text: input.userReq }] }],
@@ -74,7 +76,7 @@ export const aiRouter = createTRPCRouter({
       z.object({
         prevCode: z.string(),
         userReq: z.string(),
-        projectId: z.string()
+        projectId: z.string(),
       }),
     )
     .mutation(async ({ ctx, input }) => {
@@ -104,12 +106,16 @@ export const aiRouter = createTRPCRouter({
         `,
       });
       const result = await model.generateContent({
-        contents: [{
-          role: "user", 
-          parts: [{
-              text: `Current Code:\n${input.prevCode}\n\nUser Request:\n${input.userReq}`
-            }]
-        }],
+        contents: [
+          {
+            role: "user",
+            parts: [
+              {
+                text: `Current Code:\n${input.prevCode}\n\nUser Request:\n${input.userReq}`,
+              },
+            ],
+          },
+        ],
         generationConfig: {
           responseMimeType: "application/json",
         },
@@ -127,6 +133,34 @@ export const aiRouter = createTRPCRouter({
         },
       });
 
-      return response
+      return response;
+    }),
+  // Get summary when running the project for the first time. This will be done based on the first prompt of the user
+  // This will generate name, desc and the basic file
+  getAiSum: protectedProcedure
+    .input(
+      z.object({
+        userReq: z.string(),
+        projectId: z.string(),
+      }),
+    )
+    .mutation(async ({ ctx, input }) => {
+      // 👇 mark as processing
+      await ctx.prisma.project.update({
+        where: { id: Number(input.projectId) },
+        data: { status: "processing" },
+      });
+
+      // 👇 send background event
+      await inngest.send({
+        name: "project/generate",
+        data: {
+          userReq: input.userReq,
+          projectId: input.projectId,
+        },
+      });
+
+      // 👇 return immediately
+      return { status: "processing" };
     }),
 });

@@ -24,9 +24,14 @@ const ProjectMain = () => {
   const { projectId } = useParams();
   const trpc = useTRPC();
 
-  const { data: project, isLoading, isFetching } = useQuery(
-    trpc.project.getProject.queryOptions({ projectId: Number(projectId) })
-  );
+  const { data: project, isLoading, isFetching } = useQuery({
+    ...trpc.project.getProject.queryOptions({ projectId: Number(projectId) }),
+    // These settings stop the "continuous" background fetching
+    staleTime: Infinity,           // Data never goes stale on its own
+    refetchOnWindowFocus: false,   // Don't refetch when clicking back into the app
+    refetchOnMount: false,        // Don't refetch when the component remounts
+    refetchOnReconnect: false,
+  });
 
   // Initialize with null/undefined to check if we are ready
   const [files, setFiles] = useState<FileStructure | null>(null);
@@ -63,7 +68,7 @@ const ProjectMain = () => {
         </button>
       </header>
 
-      {isLoading || isFetching || !files ? (
+      {isLoading || !files || isFetching ? (
         <div className="flex-1 w-full flex items-center justify-center">
           <Spinner />
         </div>

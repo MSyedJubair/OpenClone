@@ -1,20 +1,20 @@
 import { Zap, Plus, Sparkles, Send, User } from "lucide-react";
-import React, { useState, KeyboardEvent } from "react";
+import React, { useState, KeyboardEvent, useEffect } from "react";
 import { Spinner } from "./ui/spinner";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { useTRPC } from "@/trpc/client";
 import { useScrollToBottom } from "@/hooks/useScrollBottom";
+import { toast } from "sonner";
 
 type ChatProps = {
   chatWidth: number;
   projectId: string;
-}
+};
 
-const Chat = ({ chatWidth, projectId,
-}: ChatProps) => {
+const Chat = ({ chatWidth, projectId }: ChatProps) => {
   const trpc = useTRPC();
   const queryClient = useQueryClient();
-  
+
   const [chatInput, setChatInput] = useState("");
 
   // Chat
@@ -24,34 +24,30 @@ const Chat = ({ chatWidth, projectId,
   const messagesEndRef = useScrollToBottom<HTMLDivElement>([Chat?.length || 0]);
 
   // Project
-  const { data: project } = useQuery(
-    trpc.project.getProject.queryOptions({ projectId: Number(projectId) })
-  );
+  const { data: project } = useQuery({
+    ...trpc.project.getProject.queryOptions({ projectId: Number(projectId) }),
+    refetchInterval: (query) => (query.state.data?.status === "processing" ? 1000 : false),
+  });
+
+  const isAiGenerating = project?.status === "processing";
 
   // Ai - two is better than one 😉
-  const { mutateAsync: generate, isPending: isAiGenerating } = useMutation(
-    trpc.Ai.getSummary.mutationOptions({
-      onSuccess: async () => {
-        await queryClient.invalidateQueries({
-          queryKey: trpc.project.getProject.queryKey({
-            projectId: Number(projectId),
-          }),
-        });
-      },
-    }),
-  );
 
-  const { mutateAsync: editCode, isPending: isCodeEditing } = useMutation(
-    trpc.Ai.editCode.mutationOptions({
-      onSuccess: async () => {
-        await queryClient.invalidateQueries({
-          queryKey: trpc.project.getProject.queryKey({
-            projectId: Number(projectId),
-          }),
-        });
-      },
-    }),
-  );
+  // const { mutateAsync: editCode, isPending: isCodeEditing } = useMutation(
+  //   trpc.Ai.editCode.mutationOptions({
+  //     onSuccess: async () => {
+  //       await queryClient.invalidateQueries({
+  //         queryKey: trpc.project.getProject.queryKey({
+  //           projectId: Number(projectId),
+  //         }),
+  //       });
+  //     },
+  //   }),
+  // );
+  
+  const { mutate: generateInitial } = useMutation(
+    trpc.Ai.getAiSum.mutationOptions(),
+  )
 
   // Send Msg - with optimistic update bruh
   const { mutateAsync: sendMessage } = useMutation(
@@ -111,23 +107,25 @@ const Chat = ({ chatWidth, projectId,
       projectId: Number(projectId),
     });
 
-    if (Chat!.length > 1) {
-      // @ts-expect-error: Its JSON so its showing all types
-      const res = await editCode({ prevCode: JSON.stringify(project!.files), userReq: input, projectId: projectId });
-      await sendMessage({
-        text: res.summary,
-        role: "Ai",
-        projectId: Number(projectId),
-      });
-    } else {
-      const res = await generate({ userReq: input, projectId });
+    generateInitial({
+      userReq: input,
+      projectId: projectId,
+    });
 
-      await sendMessage({
-        text: res.description,
-        role: "Ai",
-        projectId: Number(projectId),
-      });
-    }
+    // if (Chat!.length > 1) {
+    //   // @ts-expect-error: Its JSON so its showing all types
+    //   const res = await editCode({ prevCode: JSON.stringify(project!.files), userReq: input, projectId: projectId });
+    //   await sendMessage({
+    //     text: res.summary,
+    //     role: "Ai",
+    //     projectId: Number(projectId),
+    //   });
+    // } else {
+    //   generateInitial({
+    //     userReq: input,
+    //     projectId: projectId
+    //   })
+    // }
   };
 
   // Handle Enter Key
@@ -137,6 +135,26 @@ const Chat = ({ chatWidth, projectId,
       handleSendMessage();
     }
   };
+
+  useEffect(() => {
+    if (!isAiGenerating) {
+      // invalidate chat
+      queryClient.invalidateQueries({
+        queryKey: trpc.project.getChatMessages.queryKey({
+          projectId: Number(projectId)
+        })
+      });
+      // invalidate project
+      queryClient.invalidateQueries({
+        queryKey: trpc.project.getProject.queryKey({
+          projectId: Number(projectId)
+        })
+      });
+    }
+    if (project?.status === 'failed') {
+      toast('Failed to generate')
+    }
+  }, [isAiGenerating, projectId]);
 
   return (
     <div
@@ -200,7 +218,7 @@ const Chat = ({ chatWidth, projectId,
               </div>
             ))}
 
-            {isAiGenerating || isCodeEditing && (
+            {isAiGenerating && (
               <div className="flex gap-3 animate-pulse">
                 <div className="w-8 h-8 rounded-lg bg-zinc-900 border border-white/10 flex items-center justify-center">
                   <Sparkles size={14} className="text-indigo-400" />

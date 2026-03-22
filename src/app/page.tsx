@@ -72,9 +72,9 @@ const Home = async () => {
                 <h2 className="text-2xl font-semibold tracking-tight text-zinc-100">
                   Recent Projects
                 </h2>
-                <button className="text-sm font-medium text-indigo-400 hover:text-indigo-300 transition-colors">
+                <Link href="/project" className="text-sm font-medium text-indigo-400 hover:text-indigo-300 transition-colors">
                   View all projects
-                </button>
+                </Link>
               </div>
 
               <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
