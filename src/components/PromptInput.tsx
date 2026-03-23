@@ -63,7 +63,7 @@ const PromptInput = () => {
       });
 
       // generate the first template
-      const res = await generate({
+      await generate({
         userReq: prompt,
         projectId: project.id.toString(),
       });
