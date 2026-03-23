@@ -25,7 +25,7 @@ const PromptInput = () => {
   );
   // AI
   const { mutateAsync: generate, isPending: isAiGenerating } = useMutation(
-    trpc.Ai.getSummary.mutationOptions(),
+    trpc.Ai.getAiResponse.mutationOptions(),
   );
   // Send Msg
   const { mutateAsync: sendMessage, isPending: isSendingMsg } = useMutation(
@@ -66,12 +66,6 @@ const PromptInput = () => {
       const res = await generate({
         userReq: prompt,
         projectId: project.id.toString(),
-      });
-
-      await sendMessage({
-        text: res.description,
-        role: "Ai",
-        projectId: project.id,
       });
       
       toast.success("Workspace created! Redirecting...");

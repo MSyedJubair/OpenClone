@@ -31,22 +31,9 @@ const Chat = ({ chatWidth, projectId }: ChatProps) => {
 
   const isAiGenerating = project?.status === "processing";
 
-  // Ai - two is better than one 😉
-
-  // const { mutateAsync: editCode, isPending: isCodeEditing } = useMutation(
-  //   trpc.Ai.editCode.mutationOptions({
-  //     onSuccess: async () => {
-  //       await queryClient.invalidateQueries({
-  //         queryKey: trpc.project.getProject.queryKey({
-  //           projectId: Number(projectId),
-  //         }),
-  //       });
-  //     },
-  //   }),
-  // );
-  
-  const { mutate: generateInitial } = useMutation(
-    trpc.Ai.getAiSum.mutationOptions(),
+  // Ai   
+  const { mutate: generateResponse, isPending: isGenerating } = useMutation(
+    trpc.Ai.getAiResponse.mutationOptions(),
   )
 
   // Send Msg - with optimistic update bruh
@@ -107,25 +94,10 @@ const Chat = ({ chatWidth, projectId }: ChatProps) => {
       projectId: Number(projectId),
     });
 
-    generateInitial({
+    generateResponse({
       userReq: input,
       projectId: projectId,
     });
-
-    // if (Chat!.length > 1) {
-    //   // @ts-expect-error: Its JSON so its showing all types
-    //   const res = await editCode({ prevCode: JSON.stringify(project!.files), userReq: input, projectId: projectId });
-    //   await sendMessage({
-    //     text: res.summary,
-    //     role: "Ai",
-    //     projectId: Number(projectId),
-    //   });
-    // } else {
-    //   generateInitial({
-    //     userReq: input,
-    //     projectId: projectId
-    //   })
-    // }
   };
 
   // Handle Enter Key
@@ -150,6 +122,7 @@ const Chat = ({ chatWidth, projectId }: ChatProps) => {
           projectId: Number(projectId)
         })
       });
+      toast('Completed building your website')
     }
     if (project?.status === 'failed') {
       toast('Failed to generate')
@@ -218,7 +191,7 @@ const Chat = ({ chatWidth, projectId }: ChatProps) => {
               </div>
             ))}
 
-            {isAiGenerating && (
+            {isGenerating || isAiGenerating && (
               <div className="flex gap-3 animate-pulse">
                 <div className="w-8 h-8 rounded-lg bg-zinc-900 border border-white/10 flex items-center justify-center">
                   <Sparkles size={14} className="text-indigo-400" />

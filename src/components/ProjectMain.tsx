@@ -68,7 +68,7 @@ const ProjectMain = () => {
         </button>
       </header>
 
-      {isLoading || !files || isFetching ? (
+      {isLoading || !files ? (
         <div className="flex-1 w-full flex items-center justify-center">
           <Spinner />
         </div>
