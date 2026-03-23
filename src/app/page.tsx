@@ -85,7 +85,7 @@ const Home = async () => {
               </div>
 
               <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-                {recentProjects ? (recentProjects.map((project) => (
+                {recentProjects.length > 1 ? (recentProjects.map((project) => (
                   <Link
                     href={`/project/${project.id}`}
                     key={project.id}

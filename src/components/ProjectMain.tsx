@@ -1,7 +1,7 @@
 "use client";
 
-import { useEffect, useState } from "react";
-import { Code, Play, Rocket, Files } from "lucide-react";
+import { useState } from "react";
+import { Code, Play, Rocket, Files, Save } from "lucide-react";
 import {
   SandpackProvider,
   SandpackLayout,
@@ -11,7 +11,7 @@ import {
 } from "@codesandbox/sandpack-react";
 import { useParams } from "next/navigation";
 import { useTRPC } from "@/trpc/client";
-import { useQuery } from "@tanstack/react-query";
+import { useMutation, useQuery } from "@tanstack/react-query";
 import { Spinner } from "./ui/spinner";
 import MonacoEditor from "@/components/MonacoEditor";
 
@@ -19,8 +19,23 @@ type FileStructure = {
   [key: string]: string | FileStructure | null;
 };
 
+const Devices = [
+  {
+    id: "mobile",
+    icon: <div className="w-3 h-4 border-2 border-current rounded-[2px]" />,
+  },
+  {
+    id: "tablet",
+    icon: <div className="w-4 h-3 border-2 border-current rounded-[2px]" />,
+  },
+  {
+    id: "pc",
+    icon: <div className="w-5 h-3 border-2 border-current rounded-[1px]" />,
+  },
+];
 const ProjectMain = () => {
   const [isEditorVisible, setIsEditorVisible] = useState(false);
+  const [previewDevice, setPreviewDevice] = useState();
   const { projectId } = useParams();
   const trpc = useTRPC();
 
@@ -28,13 +43,11 @@ const ProjectMain = () => {
     ...trpc.project.getProject.queryOptions({ projectId: Number(projectId) }),
   });
 
-  const [files, setFiles] = useState<FileStructure | null>(null);
+  const { mutate, isPending } = useMutation(
+    trpc.project.saveCode.mutationOptions(),
+  );
 
-  useEffect(() => {
-    if (project?.files) {
-      setFiles(project.files as unknown as FileStructure);
-    }
-  }, [project?.id, project?.files]);
+  const files = project?.files;
 
   if (isLoading || !files) {
     return (
@@ -53,7 +66,9 @@ const ProjectMain = () => {
             <button
               onClick={() => setIsEditorVisible(false)}
               className={`flex items-center gap-2 px-4 py-1.5 text-xs font-bold rounded-md transition-all ${
-                !isEditorVisible ? "bg-zinc-800 text-white" : "text-zinc-500 hover:text-zinc-300"
+                !isEditorVisible
+                  ? "bg-zinc-800 text-white"
+                  : "text-zinc-500 hover:text-zinc-300"
               }`}
             >
               <Play size={14} /> Preview
@@ -61,7 +76,9 @@ const ProjectMain = () => {
             <button
               onClick={() => setIsEditorVisible(true)}
               className={`flex items-center gap-2 px-4 py-1.5 text-xs font-bold rounded-md transition-all ${
-                isEditorVisible ? "bg-zinc-800 text-white" : "text-zinc-500 hover:text-zinc-300"
+                isEditorVisible
+                  ? "bg-zinc-800 text-white"
+                  : "text-zinc-500 hover:text-zinc-300"
               }`}
             >
               <Code size={14} /> Code
@@ -69,9 +86,37 @@ const ProjectMain = () => {
           </div>
         </div>
 
-        <button className="flex items-center gap-2 px-5 py-2 bg-indigo-600 hover:bg-indigo-500 text-white rounded-lg text-xs font-bold transition-all shadow-lg active:scale-95">
-          <Rocket size={14} /> Deploy
-        </button>
+        {!isEditorVisible && (
+          <div className="flex bg-zinc-950 p-1 rounded-lg border border-white/5 ml-4">
+            {Devices.map((device) => (
+              <button
+                key={device.id}
+                onClick={() => setPreviewDevice(device.id)}
+                className={`px-3 py-1.5 rounded-md transition-all ${
+                  previewDevice === device.id
+                    ? "bg-zinc-800 text-white"
+                    : "text-zinc-500 hover:text-zinc-300"
+                }`}
+              >
+                {device.icon}
+              </button>
+            ))}
+          </div>
+        )}
+
+        <div className="flex gap-4">
+          <button
+            disabled={isPending}
+            className="flex items-center gap-2 px-5 py-2 bg-zinc-800 hover:bg-zinc-700 disabled:opacity-50 text-white rounded-lg text-xs font-bold transition-all shadow-lg active:scale-95"
+          >
+            {isPending ? <Spinner className="w-3 h-3" /> : <Save size={14} />}
+            {isPending ? "Saving..." : "Saved"}
+          </button>
+
+          <button className="flex items-center gap-2 px-5 py-2 bg-indigo-600 hover:bg-indigo-500 text-white rounded-lg text-xs font-bold transition-all shadow-lg active:scale-95">
+            <Rocket size={14} /> Deploy
+          </button>
+        </div>
       </header>
 
       {/* Main Container */}
@@ -114,9 +159,11 @@ const ProjectMain = () => {
               style={{
                 display: isEditorVisible ? "flex" : "none",
                 flex: 1,
+                minWidth: 0,
                 flexDirection: "column",
                 height: "100%",
                 background: "#1e1e1e",
+                overflow: "hidden",
               }}
             >
               <div className="h-9 border-b border-white/5 bg-zinc-900/80 flex items-center px-4 shrink-0">
@@ -125,21 +172,47 @@ const ProjectMain = () => {
                 </span>
               </div>
               <div className="flex-1 w-full overflow-hidden">
-                <MonacoEditor />
+                <MonacoEditor mutate={mutate} projectId={Number(projectId)} />
               </div>
             </div>
 
             {/* Preview - Only visible in Preview mode */}
-            <SandpackPreview
-              showOpenInCodeSandbox={false}
-              showRefreshButton={true}
+            <div
               style={{
                 display: !isEditorVisible ? "flex" : "none",
                 flex: 1,
                 height: "100%",
-                background: "black",
+                background: "#09090b", // Slightly lighter than pure black to see the device edges
+                alignItems: "center",
+                justifyContent: "center",
+                overflow: "auto", // Allow scrolling if the device is taller than the screen
+                padding: "20px",
               }}
-            />
+            >
+              <div
+                style={{
+                  width:
+                    previewDevice === "mobile"
+                      ? "375px"
+                      : previewDevice === "tablet"
+                        ? "768px"
+                        : "100%",
+                  height: previewDevice === "pc" ? "100%" : "80%", // PC fills height, others stay contained
+                  maxWidth: "100%",
+                  transition: "all 0.3s cubic-bezier(0.4, 0, 0.2, 1)",
+                  boxShadow: "0 25px 50px -12px rgba(0, 0, 0, 0.5)",
+                  border: previewDevice === "pc" ? "none" : "8px solid #27272a",
+                  borderRadius: previewDevice === "pc" ? "0" : "24px",
+                  overflow: "hidden",
+                }}
+              >
+                <SandpackPreview
+                  showOpenInCodeSandbox={false}
+                  showRefreshButton={true}
+                  style={{ height: "100%", width: "100%" }}
+                />
+              </div>
+            </div>
           </SandpackLayout>
         </SandpackProvider>
       </div>

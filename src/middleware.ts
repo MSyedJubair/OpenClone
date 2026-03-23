@@ -4,7 +4,7 @@ import type { NextRequest } from "next/server";
 export function middleware(req: NextRequest) {
   const isLoggedIn = Boolean(req.cookies.get("better-auth.session_token"));
 
-  const protectedRoutes = ["/dashboard", "/project", "settings"];
+  const protectedRoutes = ["/dashboard", "/project", "/settings"];
 
   const isProtected = protectedRoutes.some((route) =>
     req.nextUrl.pathname.startsWith(route),
@@ -18,5 +18,5 @@ export function middleware(req: NextRequest) {
 }
 
 export const config = {
-  matcher: ["/project/:path*"],
+  matcher: ["/project/:path*", "/dashboard", "/settings"],
 };

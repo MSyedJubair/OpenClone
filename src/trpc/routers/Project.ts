@@ -116,4 +116,19 @@ export const projectRouter = createTRPCRouter({
 
       return msg;
     }),
+    saveCode: protectedProcedure
+    .input(z.object({
+      files: z.string(),
+      projectId: z.number()
+    }))
+    .mutation(async ({ ctx, input }) => {
+      await ctx.prisma.project.update({
+        where: {
+          id: input.projectId
+        },
+        data: {
+          files: input.files
+        }
+      })
+    })
 });
