@@ -10,9 +10,10 @@ import Pusher from "pusher-js";
 type ChatProps = {
   chatWidth: number;
   projectId: string;
+  isAuthor: boolean
 };
 
-const Chat = ({ chatWidth, projectId }: ChatProps) => {
+const Chat = ({ chatWidth, projectId, isAuthor }: ChatProps) => {
   const trpc = useTRPC();
   const queryClient = useQueryClient();
 
@@ -87,6 +88,10 @@ const Chat = ({ chatWidth, projectId }: ChatProps) => {
 
   const handleSendMessage = async () => {
     if (!chatInput.trim() || isAiGenerating) return;
+
+    if (!isAuthor) {
+      return toast("You're not the owner of this project.")
+    }
 
     const input = chatInput;
     setChatInput("");

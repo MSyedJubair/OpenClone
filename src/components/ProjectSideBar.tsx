@@ -4,7 +4,7 @@ import { ChevronLeft, ChevronRight } from "lucide-react";
 import { useParams } from "next/navigation";
 import Chat from "./Chat";
 
-const ProjectSideBar = () => {
+const ProjectSideBar = ({isAuthor}:{isAuthor:boolean}) => {
   const { projectId } = useParams();
 
   const sidebarRef = useRef(null);
@@ -52,7 +52,7 @@ const ProjectSideBar = () => {
       }`}
     >
       {isChatOpen && (
-        <Chat chatWidth={chatWidth} projectId={projectId?.toString() ?? ""} />
+        <Chat chatWidth={chatWidth} projectId={projectId?.toString() ?? ""} isAuthor={isAuthor} />
       )}
 
       {/* Resize Handle (The invisible area that triggers dragging) */}

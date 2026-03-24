@@ -14,6 +14,7 @@ import { useTRPC } from "@/trpc/client";
 import { useMutation, useQuery } from "@tanstack/react-query";
 import { Spinner } from "./ui/spinner";
 import MonacoEditor from "@/components/MonacoEditor";
+import { toast } from "sonner";
 
 type FileStructure = {
   [key: string]: string | FileStructure | null;
@@ -33,7 +34,7 @@ const Devices = [
     icon: <div className="w-5 h-4 border-2 border-current rounded-[1px]" />,
   },
 ];
-const ProjectMain = () => {
+const ProjectMain = ({isAuthor}:{isAuthor:boolean}) => {
   const [isEditorVisible, setIsEditorVisible] = useState(false);
   const [previewDevice, setPreviewDevice] = useState();
   const { projectId } = useParams();
@@ -43,7 +44,7 @@ const ProjectMain = () => {
     ...trpc.project.getProject.queryOptions({ projectId: Number(projectId) }),
   });
 
-  const { mutate, isPending } = useMutation(
+  const { mutate: saveCode, isPending } = useMutation(
     trpc.project.saveCode.mutationOptions(),
   );
 
@@ -107,6 +108,16 @@ const ProjectMain = () => {
         <div className="flex gap-4">
           <button
             disabled={isPending}
+            onClick={() => {
+              if (!isAuthor){
+                toast("You're not the owner of this project.")
+                return
+              }
+              saveCode({
+                files: JSON.stringify(files),
+                projectId: Number(projectId)
+              })
+            }}
             className="flex items-center gap-2 px-5 py-2 bg-zinc-800 hover:bg-zinc-700 disabled:opacity-50 text-white rounded-lg text-xs font-bold transition-all shadow-lg active:scale-95"
           >
             {isPending ? <Spinner className="w-3 h-3" /> : <Save size={14} />}

@@ -10,7 +10,7 @@ interface Props {
 
 export default async function LovableClone({ params }: Props) {
   const { projectId } = await params;
-  
+
   const session = await auth.api.getSession({
     headers: await headers(),
   });
@@ -25,8 +25,6 @@ export default async function LovableClone({ params }: Props) {
 
   const isAuthor = project?.authorId === user?.id
 
-  console.log(isAuthor)
-
   return (
     <div
       className={`flex h-screen w-full bg-app-bg text-zinc-300 overflow-hidden selection:bg-indigo-500/30 font-sans `}
@@ -37,10 +35,10 @@ export default async function LovableClone({ params }: Props) {
       </div>
 
       {/* LEFT: Resizable & Collapsible Chat Panel} */}
-      <ProjectSideBar />
+      <ProjectSideBar isAuthor={isAuthor}/>
 
       {/* RIGHT: Preview & Code Panel */}
-      <ProjectMain />
+      <ProjectMain isAuthor={isAuthor}/>
     </div>
   );
 }

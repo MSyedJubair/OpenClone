@@ -14,7 +14,7 @@ import {
 import { useState } from "react";
 import { Spinner } from "./ui/spinner";
 import Link from "next/link";
-import { usePathname } from "next/navigation"; // 1. Import usePathname
+import { usePathname, useRouter } from "next/navigation"; // 1. Import usePathname
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -30,6 +30,8 @@ const SideBar = () => {
   const [isSidebarCollapsed, setIsSidebarCollapsed] = useState(false);
   const pathname = usePathname(); // 2. Get current route
   const trpc = useTRPC();
+
+  const router = useRouter()
   
   const {
     data: User,
@@ -146,6 +148,7 @@ const SideBar = () => {
                     onClick={() => {
                       authClient.signOut();
                       toast("Successfully Signed Out");
+                      router.push('/')
                     }}
                   >
                     Logout
