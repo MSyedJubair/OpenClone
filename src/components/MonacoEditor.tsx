@@ -5,7 +5,7 @@ import {
   useSandpack,
 } from "@codesandbox/sandpack-react";
 
-export default function MonacoEditor({ projectId, mutate }) {
+export default function MonacoEditor() {
   const { code, updateCode } = useActiveCode();
   const { sandpack } = useSandpack();
 
@@ -21,10 +21,6 @@ export default function MonacoEditor({ projectId, mutate }) {
           defaultValue={code}
           onChange={(value) => {
             updateCode(value || "");
-            mutate({
-              files: value || '',
-              projectId: projectId,
-            });
           }}
         />
       </div>

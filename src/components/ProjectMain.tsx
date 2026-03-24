@@ -30,7 +30,7 @@ const Devices = [
   },
   {
     id: "pc",
-    icon: <div className="w-5 h-3 border-2 border-current rounded-[1px]" />,
+    icon: <div className="w-5 h-4 border-2 border-current rounded-[1px]" />,
   },
 ];
 const ProjectMain = () => {
@@ -172,7 +172,7 @@ const ProjectMain = () => {
                 </span>
               </div>
               <div className="flex-1 w-full overflow-hidden">
-                <MonacoEditor mutate={mutate} projectId={Number(projectId)} />
+                <MonacoEditor />
               </div>
             </div>
 

@@ -1,0 +1,23 @@
+Downloading code
+uploading on vercel
+saving code
+
+limit AI usage
+
+Dashboard {
+    What to show:
+    👋 Welcome + user name
+    📊 Stats:
+    total projects
+    last edited
+    AI generations used
+    ⚡ Quick actions:
+    “New Project”
+    “Continue Last Project”
+    🧠 Recent chats (from your Message model)
+    ⭐ Starred projects
+}
+
+settings {
+    update name
+}

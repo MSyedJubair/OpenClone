@@ -47,6 +47,7 @@ export const generateSummary = inngest.createFunction(
     const systemPrompt = `
       You are an expert React developer. 
       Generate a project structure for Sandpack using Tailwind CSS. 
+      Make sure the design is modern and the code is responsive across all devices.
 
       IMPORTANT: Return ONLY a valid JSON object. 
       Do not include explanations or markdown outside the JSON block.
@@ -61,8 +62,8 @@ export const generateSummary = inngest.createFunction(
         "name": "string",
         "description": "string",
         "files": {
-            "/App.js": "source code string",
-            "/components/header.ts": "header code string"
+            "/App.jsx": "source code string",
+            "/components/header.jsx": "header code string"
           }
       }
 
@@ -172,8 +173,17 @@ export const editCode = inngest.createFunction(
       You are an expert React developer. 
       Your task is to edit existing code based on user requirements. Maintain the existing code's style and logic unless the user explicitly asks to change it.
 
+      Generate a project structure for Sandpack using Tailwind CSS. 
+      Make sure the design is modern and the code is responsive across all devices.
+
       IMPORTANT: Return ONLY a valid JSON object. 
       Do not include explanations or markdown outside the JSON block.
+      
+      Rules:
+      - Only use React
+      - Only use Tailwind
+      - Only use React
+      - Only use Tailwind
 
       Return ONLY a JSON object with:
       1. "summary": short summary of what you have done
@@ -183,8 +193,8 @@ export const editCode = inngest.createFunction(
       {
         "summary": "string",
         "files": {
-            "/App.js": "source code string",
-            "/styles.css": "css string"
+            "/App.jsx": "source code string",
+            "/components/header.jsx": "header code string"
           }
       }
 
