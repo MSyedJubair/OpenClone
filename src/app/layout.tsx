@@ -38,9 +38,11 @@ export default function RootLayout({
       <body className={`${montserrat.className} antialiased`}>
         <TRPCReactProvider>
           <Toaster />
-          <div className="flex flex-row w-full overflow-x-hidden">
+          <div className="flex h-screen overflow-hidden w-full">
             <SideBar />
-            <main className="flex-1">{children}</main>
+            <main className="flex-1 overflow-y-auto bg-background">
+              {children}
+            </main>
           </div>
         </TRPCReactProvider>
       </body>

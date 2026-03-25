@@ -6,11 +6,12 @@ import { useTRPC } from "@/trpc/client";
 import { useScrollToBottom } from "@/hooks/useScrollBottom";
 import { toast } from "sonner";
 import Pusher from "pusher-js";
+import Image from "next/image";
 
 type ChatProps = {
   chatWidth: number;
   projectId: string;
-  isAuthor: boolean
+  isAuthor: boolean;
 };
 
 const Chat = ({ chatWidth, projectId, isAuthor }: ChatProps) => {
@@ -18,7 +19,12 @@ const Chat = ({ chatWidth, projectId, isAuthor }: ChatProps) => {
   const queryClient = useQueryClient();
 
   const [chatInput, setChatInput] = useState("");
-  const [isAiGenerating, setisAiGenerating] = useState(false);
+  
+  // Project
+  const { data: project } = useQuery({
+    ...trpc.project.getProject.queryOptions({ projectId: Number(projectId) }),
+  });
+  const [isAiGenerating, setisAiGenerating] = useState(project?.status === 'processing');
 
   // Chat
   const { data: Chat, isLoading } = useQuery(
@@ -85,7 +91,7 @@ const Chat = ({ chatWidth, projectId, isAuthor }: ChatProps) => {
     if (!chatInput.trim() || isAiGenerating) return;
 
     if (!isAuthor) {
-      return toast("You're not the owner of this project.")
+      return toast("You're not the owner of this project.");
     }
 
     const input = chatInput;
@@ -149,8 +155,8 @@ const Chat = ({ chatWidth, projectId, isAuthor }: ChatProps) => {
     >
       <header className="p-4 border-b border-white/5 flex items-center justify-between shrink-0 bg-zinc-950/50 backdrop-blur-md">
         <div className="flex items-center gap-3">
-          <div className="w-8 h-8 bg-linear-to-br from-indigo-500 via-purple-500 to-pink-500 rounded-lg flex items-center justify-center shadow-lg shadow-indigo-500/20">
-            <Zap size={14} className="text-white fill-current" />
+          <div className="w-8 h-8 bg-linear-to-br rounded-lg flex items-center justify-center shadow-lg shadow-gray-500/20">
+            <Image src="/Logo.png" alt="Logo" width={30} height={30} />
           </div>
           <span className="font-semibold text-sm tracking-tight text-white">
             OpenClone.ai

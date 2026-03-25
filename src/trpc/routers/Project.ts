@@ -23,7 +23,7 @@ export const projectRouter = createTRPCRouter({
                             <div className="absolute -inset-1 bg-gradient-to-r from-indigo-500 to-purple-600 rounded-lg blur opacity-25"></div>
                             <h1 className="relative text-5xl font-bold mb-4 tracking-tighter">OpenClone.ai</h1>
                         </div>
-                        <p className="text-zinc-400 font-medium">Resizable & Collapsible Sidebar Ready.</p>
+                        <p className="text-zinc-400 font-medium">Your Initial Setup Is Ready!</p>
                         </div>
                     );
                 }`,

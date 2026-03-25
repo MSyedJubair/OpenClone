@@ -5,15 +5,28 @@ import {
   LayoutDashboard,
   Clock,
   MoreVertical,
-  ChevronDown,
-  Plus,
   ArrowRight,
   MessageSquare,
+  Mail,
+  Settings,
+  LogOut,
   Zap,
+  CheckCircle2,
+  LayoutGrid,
 } from "lucide-react";
 import Link from "next/link";
 import { timeAgo } from "@/lib/utils";
 import NewProject from "@/components/NewProject";
+import { Spinner } from "@/components/ui/spinner";
+import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
+import {
+  Card,
+  CardContent,
+  CardHeader,
+  CardTitle,
+  CardDescription,
+} from "@/components/ui/card";
+import { Button } from "@/components/ui/button";
 
 const Dashboard = async () => {
   const session = await auth.api.getSession({
@@ -54,39 +67,58 @@ const Dashboard = async () => {
       {/* Header / User Profile */}
       <header className="flex flex-col md:flex-row md:items-center justify-between gap-4 mb-10">
         <div>
-          <h1 className="text-3xl font-bold text-white tracking-tight">Dashboard</h1>
-          <p className="text-zinc-500 mt-1">Welcome back, {user?.name?.split(" ")[0] || "User"}</p>
-        </div>
-
-        <div className="flex items-center gap-3 bg-app-surface/50 border border-white/5 p-2 pr-4 rounded-full w-fit">
-          <div className="w-9 h-9 rounded-full bg-brand-indigo/20 border border-brand-indigo/50 flex items-center justify-center text-brand-indigo font-bold shrink-0">
-            {user?.name?.[0]?.toUpperCase()}
-          </div>
-          <div className="flex flex-col">
-            <p className="text-sm font-medium text-zinc-200 leading-none">{user?.name}</p>
-            <p className="text-xs text-zinc-500 mt-1">{user?.email}</p>
-          </div>
-          <ChevronDown className="w-4 h-4 text-zinc-600 ml-2" />
+          <h1 className="text-3xl font-bold text-white tracking-tight">
+            Dashboard
+          </h1>
+          <p className="text-zinc-500 mt-1">
+            Welcome back, {user?.name?.split(" ")[0] || "User"}
+          </p>
         </div>
       </header>
+      <div className="flex flex-col md:flex-row items-center gap-8 mb-12 bg-app-surface/40 p-8 rounded-4xl border border-white/5 backdrop-blur-xl">
+        <div className="relative group">
+          <div className="absolute -inset-1 bg-linear-to-tr from-brand-indigo via-brand-purple to-brand-pink rounded-full blur opacity-25 group-hover:opacity-50 transition duration-500"></div>
+          <Avatar className="h-32 w-32 border-2 border-zinc-900 relative">
+            <AvatarImage src={user?.image ?? ""} alt={user?.name} />
+            <AvatarFallback className="bg-zinc-800 text-3xl font-bold">
+              {user?.name.charAt(0)}
+            </AvatarFallback>
+          </Avatar>
+        </div>
+
+        <div className="flex-1 text-center md:text-left">
+          <div className="flex items-center justify-center md:justify-start gap-3 mb-2">
+            <h1 className="text-4xl font-bold text-white tracking-tight">
+              {user?.name}
+            </h1>
+            {user?.emailVerified && (
+              <CheckCircle2 className="text-status-live w-6 h-6" />
+            )}
+          </div>
+          <p className="text-zinc-500 text-lg flex items-center justify-center md:justify-start gap-2 mb-6">
+            <Mail size={18} /> {user?.email}
+          </p>
+          <div className="flex flex-wrap items-center justify-center md:justify-start gap-3">
+            <Button
+              variant="outline"
+              className="rounded-xl border-white/10 bg-white/5 hover:bg-white/10 gap-2"
+            >
+              <Settings size={16} /> Edit Profile
+            </Button>
+            <Button
+              variant="destructive"
+              className="rounded-xl gap-2 bg-red-500/10 text-red-400 border border-red-500/20 hover:bg-red-500/20"
+            >
+              <LogOut size={16} /> Logout
+            </Button>
+          </div>
+        </div>
+      </div>
 
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
         {/* Main Content: Projects */}
         <div className="lg:col-span-2 space-y-8">
           <section>
-            <div className="flex items-center justify-between mb-6">
-              <h2 className="text-xl font-semibold text-zinc-100 flex items-center gap-2">
-                <Clock className="w-5 h-5 text-brand-indigo" />
-                Recent Projects
-              </h2>
-              <Link
-                href="/project"
-                className="text-sm font-medium text-brand-indigo hover:text-indigo-300 transition-colors"
-              >
-                View all projects
-              </Link>
-            </div>
-
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
               {projects.length > 0 ? (
                 projects.map((project) => (
@@ -101,8 +133,12 @@ const Dashboard = async () => {
                       </div>
                       <MoreVertical className="w-4 h-4 text-zinc-600 opacity-0 group-hover:opacity-100 transition-opacity" />
                     </div>
-                    <h3 className="font-medium text-white mb-1 truncate">{project.name}</h3>
-                    <p className="text-xs text-zinc-500">{timeAgo(project.createdAt)}</p>
+                    <h3 className="font-medium text-white mb-1 truncate">
+                      {project.name}
+                    </h3>
+                    <p className="text-xs text-zinc-500">
+                      {timeAgo(project.createdAt)}
+                    </p>
                   </Link>
                 ))
               ) : (
@@ -115,16 +151,48 @@ const Dashboard = async () => {
           </section>
 
           <section>
-            <h2 className="text-xl font-semibold text-zinc-100 mb-6">Overview</h2>
+            <h2 className="text-xl font-semibold text-zinc-100 mb-6">
+              Overview
+            </h2>
             <div className="grid grid-cols-2 sm:grid-cols-3 gap-4">
-              <div className="bg-app-surface/40 p-5 rounded-2xl border border-white/5">
-                <p className="text-zinc-500 text-sm mb-1">Total Projects</p>
-                <p className="text-2xl font-bold text-white">{projectCount}</p>
-              </div>
-              <div className="bg-app-surface/40 p-5 rounded-2xl border border-white/5">
-                <p className="text-zinc-500 text-sm mb-1">Messages</p>
-                <p className="text-2xl font-bold text-white">{messageCount}</p>
-              </div>
+              <Card className="bg-app-surface/50 border-white/5 backdrop-blur-md rounded-3xl overflow-hidden group">
+                <CardHeader className="pb-2">
+                  <CardDescription className="uppercase tracking-widest text-[10px] font-bold text-zinc-500">
+                    Workspace
+                  </CardDescription>
+                  <CardTitle className="text-white flex items-center gap-2">
+                    <LayoutGrid size={20} className="text-brand-indigo" />{" "}
+                    Messages
+                  </CardTitle>
+                </CardHeader>
+                <CardContent>
+                  <div className="text-4xl font-bold text-white mb-1">
+                    {messageCount}
+                  </div>
+                  <p className="text-xs text-zinc-500">
+                    Total applications built
+                  </p>
+                </CardContent>
+              </Card>
+              <Card className="bg-app-surface/50 border-white/5 backdrop-blur-md rounded-3xl overflow-hidden group">
+                <CardHeader className="pb-2">
+                  <CardDescription className="uppercase tracking-widest text-[10px] font-bold text-zinc-500">
+                    Workspace
+                  </CardDescription>
+                  <CardTitle className="text-white flex items-center gap-2">
+                    <LayoutGrid size={20} className="text-brand-indigo" />{" "}
+                    Projects
+                  </CardTitle>
+                </CardHeader>
+                <CardContent>
+                  <div className="text-4xl font-bold text-white mb-1">
+                    {projects?.length || 0}
+                  </div>
+                  <p className="text-xs text-zinc-500">
+                    Total applications built
+                  </p>
+                </CardContent>
+              </Card>
             </div>
           </section>
         </div>
@@ -144,7 +212,9 @@ const Dashboard = async () => {
                   <div className="flex items-center gap-3">
                     <MessageSquare className="w-4 h-4 text-brand-purple" />
                     <div className="text-left">
-                      <p className="text-sm font-medium text-zinc-200">Continue Last</p>
+                      <p className="text-sm font-medium text-zinc-200">
+                        Continue Last
+                      </p>
                       <p className="text-xs text-zinc-500 truncate max-w-[120px]">
                         {lastProject.name}
                       </p>
@@ -157,8 +227,8 @@ const Dashboard = async () => {
           </section>
           <div className="p-6 bg-app-surface/20 rounded-2xl border border-white/5 text-xs text-zinc-600 leading-relaxed">
             <p>
-              Tip: Use the <strong>More</strong> menu on project cards to archive or rename your
-              workspaces.
+              Tip: Use the <strong>More</strong> menu on project cards to
+              archive or rename your workspaces.
             </p>
           </div>
         </div>

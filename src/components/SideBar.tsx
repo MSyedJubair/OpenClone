@@ -54,9 +54,10 @@ const SideBar = () => {
           className={`p-6 flex items-center ${isSidebarCollapsed ? "justify-center" : "justify-between"} gap-2`}
         >
           <div className="flex items-center gap-3 cursor-pointer overflow-hidden">
-            <div className="bg-linear-to-tr from-indigo-500 to-purple-500 p-2 rounded-xl shrink-0 shadow-lg shadow-indigo-500/20">
+            {/* <div className="bg-linear-to-tr from-indigo-500 to-purple-500 p-2 rounded-xl shrink-0 shadow-lg shadow-indigo-500/20">
               <Sparkles className="w-4 h-4 text-white" />
-            </div>
+            </div> */}
+            <img src="/Logo.png" alt="Logo" width={50} height={50}/>
             {!isSidebarCollapsed && (
               <span className="font-semibold text-xl tracking-tight whitespace-nowrap">
                 Open<span className="text-white/50">Clone</span>
@@ -120,7 +121,11 @@ const SideBar = () => {
           >
             {User.image ? (
               <div className="w-10 h-10 rounded-full bg-indigo-500/20 border border-blue-500/50 flex items-center justify-center text-indigo-300 font-medium shrink-0">
-                <img src={User.image} alt="UserProfile" className="rounded-full" />
+                <img
+                  src={User.image}
+                  alt="UserProfile"
+                  className="rounded-full"
+                />
               </div>
             ) : (
               <div className="w-10 h-10 rounded-full bg-indigo-500/20 border border-indigo-500/50 flex items-center justify-center text-indigo-300 font-medium shrink-0">
@@ -143,10 +148,20 @@ const SideBar = () => {
                 <DropdownMenuContent side="top" className="w-56" align="end">
                   <DropdownMenuLabel>My Account</DropdownMenuLabel>
                   <DropdownMenuSeparator />
-                  <DropdownMenuItem className="cursor-pointer">
+                  <DropdownMenuItem
+                    className="cursor-pointer"
+                    onClick={() => {
+                      router.push("/profile");
+                    }}
+                  >
                     Profile
                   </DropdownMenuItem>
-                  <DropdownMenuItem className="cursor-pointer">
+                  <DropdownMenuItem
+                    className="cursor-pointer"
+                    onClick={() => {
+                      router.push("/settings");
+                    }}
+                  >
                     Settings
                   </DropdownMenuItem>
                   <DropdownMenuSeparator />
