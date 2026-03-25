@@ -25,7 +25,7 @@ import {
   CardDescription,
 } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
-import { Project } from "@prisma/client";
+import { type Project } from "@prisma/client";
 
 const Dashboard = async () => {
   const session = await auth.api.getSession({
