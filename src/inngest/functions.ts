@@ -60,7 +60,7 @@ export const generateSummary = inngest.createFunction(
       Rules:
       - Only use React
       - Only use Tailwind
-      - Don't use ./src directory
+      - Don't use ./src directory and only use jsx
       - Only use Tailwind
       
       Structure:
