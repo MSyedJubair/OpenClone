@@ -68,8 +68,8 @@ export const generateSummary = inngest.createFunction(
         "name": "string",
         "description": "string",
         "files": {
-            "/App.js": "source code string",
-            "/components/header.js": "header code string"
+            "/App.jsx": "source code string",
+            "/components/header.jsx": "header code string"
           }
       }
 
@@ -198,8 +198,8 @@ export const editCode = inngest.createFunction(
       {
         "summary": "string",
         "files": {
-            "/App.js": "source code string",
-            "/components/header.js": "header code string"
+            "/App.jsx": "source code string",
+            "/components/header.jsx": "header code string"
           }
       }
 
