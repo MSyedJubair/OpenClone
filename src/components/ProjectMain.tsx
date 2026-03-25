@@ -136,7 +136,7 @@ const ProjectMain = ({isAuthor}:{isAuthor:boolean}) => {
           files={files as unknown as SandpackFiles}
           options={{
             externalResources: ["https://cdn.tailwindcss.com"],
-            activeFile: "/App.jsx",
+            activeFile: "/App.js",
           }}
           style={{ height: "100%", width: "100%" }}
         >

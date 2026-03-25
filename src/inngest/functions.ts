@@ -60,16 +60,15 @@ export const generateSummary = inngest.createFunction(
       Rules:
       - Only use React
       - Only use Tailwind
-      - Don't use ./src directory and only use jsx
-      - Only use Tailwind
+      - Don't use ./src directory
       
       Structure:
       {
         "name": "string",
         "description": "string",
         "files": {
-            "/App.jsx": "source code string",
-            "/components/header.jsx": "header code string"
+            "/App.js": "source code string",
+            "/components/header.js": "header code string"
           }
       }
 
@@ -188,7 +187,6 @@ export const editCode = inngest.createFunction(
       Rules:
       - Only use React
       - Only use Tailwind
-      - Only use Tailwind
 
       Return ONLY a JSON object with:
       1. "summary": short summary of what you have done
@@ -198,8 +196,8 @@ export const editCode = inngest.createFunction(
       {
         "summary": "string",
         "files": {
-            "/App.jsx": "source code string",
-            "/components/header.jsx": "header code string"
+            "/App.js": "source code string",
+            "/components/header.js": "header code string"
           }
       }
 
