@@ -15,7 +15,7 @@ import {
 } from "lucide-react";
 import Link from "next/link";
 import { timeAgo } from "@/lib/utils";
-import NewProject from "@/components/NewProject";
+import NewProject from "@/components/Home/NewProject";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import {
   Card,

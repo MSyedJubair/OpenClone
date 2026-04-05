@@ -1,8 +1,8 @@
-import ProjectMain from "@/components/ProjectMain";
-import ProjectSideBar from "@/components/ProjectSideBar";
 import { headers } from "next/headers";
 import prisma from "@/lib/db";
 import { auth } from "@/lib/auth";
+import Project from "@/components/Project/Project-View";
+import Header from "@/components/Project/Header";
 
 interface Props {
   params: Promise<{ projectId: string }>;
@@ -17,11 +17,11 @@ export default async function LovableClone({ params }: Props) {
 
   const checkIfVerified = async () => {
     const session = await auth.api.getSession({ headers: await headers() });
-    console.log(session?.user.emailVerified)
+    console.log(session?.user.emailVerified);
     return session?.user.emailVerified;
   };
 
-  checkIfVerified()
+  checkIfVerified();
 
   const user = session?.user;
 
@@ -31,7 +31,7 @@ export default async function LovableClone({ params }: Props) {
     },
   });
 
-  const isAuthor = project?.authorId === user?.id
+  const isAuthor = project?.authorId === user?.id;
 
   return (
     <div
@@ -41,12 +41,11 @@ export default async function LovableClone({ params }: Props) {
         <div className="absolute -top-[10%] -left-[10%] w-[40%] h-[40%] bg-indigo-500/10 rounded-full blur-[120px] animate-drift" />
         <div className="absolute -bottom-[10%] -right-[10%] w-[40%] h-[40%] bg-purple-500/10 rounded-full blur-[120px] animate-drift-slow" />
       </div>
+      <div className="flex flex-col w-full ">
+        <Header projectId={projectId}/>
+      <Project isAuthor={isAuthor}/>
+      </div>
 
-      {/* LEFT: Resizable & Collapsible Chat Panel} */}
-      <ProjectSideBar isAuthor={isAuthor}/>
-
-      {/* RIGHT: Preview & Code Panel */}
-      <ProjectMain isAuthor={isAuthor}/>
     </div>
   );
 }

@@ -1,11 +1,10 @@
 "use client";
 
 import { useState } from "react";
-import AuthLayout from "@/components/AuthLayout";
 import { authClient } from "@/lib/auth-client";
 import { toast } from "sonner";
 import { useRouter } from "next/navigation";
-import { Loader2, Mail, Lock, Github, Chrome } from "lucide-react";
+import { Github, Chrome } from "lucide-react";
 
 export default function SignIn() {
   const [email, setEmail] = useState("");
@@ -114,7 +113,6 @@ export default function SignIn() {
   // </form>;
 
   return (
-    <AuthLayout>
       <div className="w-full max-w-md mx-auto">
         <div className="bg-app-surface/40 backdrop-blur-2xl border border-white/5 rounded-3xl p-8 shadow-[0_20px_50px_rgba(0,0,0,0.5)]">
           {/* Header */}
@@ -167,6 +165,5 @@ export default function SignIn() {
           </p>
         </div>
       </div>
-    </AuthLayout>
   );
 }

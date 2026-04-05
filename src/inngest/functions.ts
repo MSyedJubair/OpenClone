@@ -38,6 +38,10 @@ export const generateSummary = inngest.createFunction(
           status: "failed",
         },
       });
+
+      await pusher.trigger(`project-${projectId}`, "failed", {
+        message: "Generation failed",
+      })
     },
   },
   { event: "project/generate" },
@@ -46,31 +50,46 @@ export const generateSummary = inngest.createFunction(
 
     const systemPrompt = `
       You are an expert React developer. 
-      Generate a project structure for Sandpack using Tailwind CSS. 
+      Generate a project structure for webcontainer using Tailwind CSS. 
       Make sure the design is modern and the code is responsive across all devices.
 
       IMPORTANT: Return ONLY a valid JSON object. 
       Do not include explanations or markdown outside the JSON block.
 
       Return ONLY a JSON object with:
-      1. "name": project name
+      1. "name": A meaningfull, 2-3 words project name
       2. "description": A descriptive summary of the project
-      3. "files": an object where keys are filenames (e.g., "/App.js") and values are the code strings.
+      3. "files": an object.
 
       Rules:
       - Only use React
       - Only use Tailwind
-      - Don't use ./src directory
       
       Structure:
       {
         "name": "string",
         "description": "string",
         "files": {
-            "/App.js": "source code string",
-            "/components/header.js": "header code string"
-          }
-      }
+            "App.jsx": {
+              file: {
+                contents: "source code string",
+              },
+            },
+            components: {
+              directory: {
+                "header.jsx": {
+                  file: {
+                    contents: "source code string",
+                  },
+                },
+              },
+            },
+            "package.json": {
+              file: {
+                contents: "add dependencies and versions",
+              },
+            },
+        }
 
       Note: Ensure all code strings are properly escaped for JSON. Use double quotes for JSON keys/values and escape internal quotes in the code.
     `;
@@ -168,6 +187,10 @@ export const editCode = inngest.createFunction(
           status: "failed",
         },
       });
+
+      await pusher.trigger(`project-${projectId}`, "failed", {
+        message: "Generation failed",
+      })
     },
   },
   { event: "project/edit" },

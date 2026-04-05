@@ -12,7 +12,7 @@ import {
   House,
 } from "lucide-react";
 import { useState } from "react";
-import { Spinner } from "./ui/spinner";
+import { Spinner } from "../ui/spinner";
 import Link from "next/link";
 import { usePathname, useRouter } from "next/navigation"; // 1. Import usePathname
 import {
@@ -22,7 +22,7 @@ import {
   DropdownMenuLabel,
   DropdownMenuSeparator,
   DropdownMenuTrigger,
-} from "./ui/dropdown-menu";
+} from "../ui/dropdown-menu";
 import { authClient } from "@/lib/auth-client";
 import { toast } from "sonner";
 

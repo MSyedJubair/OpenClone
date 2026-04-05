@@ -1,6 +1,6 @@
 import { LayoutDashboard, Zap, Clock, MoreVertical } from "lucide-react";
-import PromptInput from "@/components/PromptInput";
-import NewProject from "@/components/NewProject";
+import PromptInput from "@/components/Home/PromptInput";
+import NewProject from "@/components/Home/NewProject";
 import prisma from "@/lib/db";
 import Link from "next/link";
 import { headers } from "next/headers";
@@ -85,41 +85,44 @@ const Home = async () => {
               </div>
 
               <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-                {recentProjects.length > 1 ? (recentProjects.map((project) => (
-                  <Link
-                    href={`/project/${project.id}`}
-                    key={project.id}
-                    className="group bg-app-surface/60 backdrop-blur-md border border-white/5 hover:border-indigo-500/40 rounded-2xl p-6 transition-all duration-300 hover:-translate-y-1 hover:shadow-[0_10_30px_rgba(99,102,241,0.15)] cursor-pointer"
-                  >
-                    <div className="flex justify-between items-start mb-6">
-                      <div className="w-12 h-12 rounded-xl bg-white/5 border border-white/10 flex items-center justify-center group-hover:bg-indigo-500/10 transition-colors">
-                        <LayoutDashboard className="w-6 h-6 text-zinc-400 group-hover:text-indigo-400 transition-colors" />
+                {recentProjects.length > 1 ? (
+                  recentProjects.map((project) => (
+                    <Link
+                      href={`/project/${project.id}`}
+                      key={project.id}
+                      className="group bg-app-surface/60 backdrop-blur-md border border-white/5 hover:border-indigo-500/40 rounded-2xl p-6 transition-all duration-300 hover:-translate-y-1 hover:shadow-[0_10_30px_rgba(99,102,241,0.15)] cursor-pointer"
+                    >
+                      <div className="flex justify-between items-start mb-6">
+                        <div className="w-12 h-12 rounded-xl bg-white/5 border border-white/10 flex items-center justify-center group-hover:bg-indigo-500/10 transition-colors">
+                          <LayoutDashboard className="w-6 h-6 text-zinc-400 group-hover:text-indigo-400 transition-colors" />
+                        </div>
+                        <button className="text-zinc-500 hover:text-white opacity-0 group-hover:opacity-100 transition-opacity p-1">
+                          <MoreVertical className="w-5 h-5" />
+                        </button>
                       </div>
-                      <button className="text-zinc-500 hover:text-white opacity-0 group-hover:opacity-100 transition-opacity p-1">
-                        <MoreVertical className="w-5 h-5" />
-                      </button>
-                    </div>
 
-                    <h3 className="font-semibold text-lg text-white mb-2 truncate">
-                      {project.name}
-                    </h3>
-                    <div className="flex items-center gap-3 text-sm text-zinc-500 mt-4">
-                      <span className="flex items-center gap-1.5">
-                        <Clock className="w-4 h-4" />{" "}
-                        {timeAgo(project.createdAt)}
-                      </span>
-                      <span className="w-1.5 h-1.5 rounded-full bg-zinc-600"></span>
-                      {/* <span
-                        className={`font-medium ${project.status === "Live" ? "text-emerald-400" : "text-amber-400"}`}
-                      >
-                        {project.status}
-                      </span> */}
-                    </div>
-                  </Link>
-                ))): (
-                  <div>
-                    No Projects
-                  </div>
+                      <h3 className="font-semibold text-lg text-white mb-2 truncate">
+                        {project.name}
+                      </h3>
+                      <div className="flex items-center gap-3 text-sm text-zinc-500 mt-4">
+                        <span className="flex items-center gap-1.5">
+                          <Clock className="w-4 h-4" />{" "}
+                          {timeAgo(project.createdAt)}
+                        </span>
+                        <span className="w-1.5 h-1.5 rounded-full bg-zinc-600"></span>
+                        {project.status && (
+                          <span
+                            className={`font-medium ${project.status === "completed" ? "text-emerald-400" : "text-amber-400"}`}
+                          >
+                            {project.status?.charAt(0).toUpperCase() +
+                              project.status?.slice(1)}
+                          </span>
+                        )}
+                      </div>
+                    </Link>
+                  ))
+                ) : (
+                  <div>No Projects</div>
                 )}
               </div>
             </div>

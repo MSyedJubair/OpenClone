@@ -4,7 +4,8 @@ import { TRPCReactProvider } from "@/trpc/client";
 import "./globals.css";
 import { SandPackCSS } from "@/components/sandpack-styles";
 import { Toaster } from "sonner";
-import SideBar from "@/components/SideBar";
+import ProjectContextProvider from "@/context/ProjectContextProvider";
+
 
 // const geistSans = Geist({
 //   variable: "--font-geist-sans",
@@ -38,12 +39,9 @@ export default function RootLayout({
       <body className={`${montserrat.className} antialiased`}>
         <TRPCReactProvider>
           <Toaster />
-          <div className="flex h-screen overflow-hidden w-full">
-            <SideBar />
-            <main className="flex-1 overflow-y-auto bg-background">
-              {children}
-            </main>
-          </div>
+          <ProjectContextProvider>
+            {children}
+          </ProjectContextProvider>
         </TRPCReactProvider>
       </body>
     </html>

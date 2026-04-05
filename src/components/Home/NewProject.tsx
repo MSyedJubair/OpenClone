@@ -3,7 +3,7 @@ import { useState } from "react"; // Added useState
 import { useTRPC } from "@/trpc/client";
 import { useMutation, useQuery } from "@tanstack/react-query";
 import { Plus, Bell, LogIn, Loader2 } from "lucide-react"; // Added Loader2 for variety
-import { Spinner } from "./ui/spinner";
+import { Spinner } from "../ui/spinner";
 import { useRouter } from "next/navigation";
 import { toast } from "sonner";
 

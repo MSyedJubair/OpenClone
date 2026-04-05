@@ -1,30 +1,30 @@
-import { Zap, Plus, Sparkles, Send, User } from "lucide-react";
+import { Sparkles, Send, User, ChevronRight } from "lucide-react";
 import React, { useState, KeyboardEvent, useEffect } from "react";
-import { Spinner } from "./ui/spinner";
+import { Spinner } from "../ui/spinner";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { useTRPC } from "@/trpc/client";
 import { useScrollToBottom } from "@/hooks/useScrollBottom";
 import { toast } from "sonner";
 import Pusher from "pusher-js";
-import Image from "next/image";
+
 
 type ChatProps = {
-  chatWidth: number;
   projectId: string;
   isAuthor: boolean;
 };
 
-const Chat = ({ chatWidth, projectId, isAuthor }: ChatProps) => {
+const Chat = ({ projectId, isAuthor }: ChatProps) => {
   const trpc = useTRPC();
   const queryClient = useQueryClient();
 
   const [chatInput, setChatInput] = useState("");
-  
+
   // Project
   const { data: project } = useQuery({
     ...trpc.project.getProject.queryOptions({ projectId: Number(projectId) }),
   });
-  const [isAiGenerating, setisAiGenerating] = useState(project?.status === 'processing');
+  const [isAiGenerating, setisAiGenerating] = useState<undefined | boolean>();
+  const isAiProcessing = project?.status === 'processing'
 
   // Chat
   const { data: Chat, isLoading } = useQuery(
@@ -88,7 +88,7 @@ const Chat = ({ chatWidth, projectId, isAuthor }: ChatProps) => {
   );
 
   const handleSendMessage = async () => {
-    if (!chatInput.trim() || isAiGenerating) return;
+    if (!chatInput.trim() || isAiGenerating || isAiProcessing) return;
 
     if (!isAuthor) {
       return toast("You're not the owner of this project.");
@@ -141,6 +141,12 @@ const Chat = ({ chatWidth, projectId, isAuthor }: ChatProps) => {
       toast.success("Project updated!");
     });
 
+    channel.bind('failed', () => {
+      setisAiGenerating(false)
+
+      toast.success("Something Went Wrong");
+    })
+
     // Cleanup on unmount
     return () => {
       pusher.unsubscribe(`project-${projectId}`);
@@ -149,23 +155,7 @@ const Chat = ({ chatWidth, projectId, isAuthor }: ChatProps) => {
   }, [projectId, queryClient]);
 
   return (
-    <div
-      className="flex flex-col h-full overflow-hidden bg-zinc-950 border-r border-white/5"
-      style={{ width: `${chatWidth}px` }}
-    >
-      <header className="p-4 border-b border-white/5 flex items-center justify-between shrink-0 bg-zinc-950/50 backdrop-blur-md">
-        <div className="flex items-center gap-3">
-          <div className="w-8 h-8 bg-linear-to-br rounded-lg flex items-center justify-center shadow-lg shadow-gray-500/20">
-            <Image src="/Logo.png" alt="Logo" width={30} height={30} />
-          </div>
-          <span className="font-semibold text-sm tracking-tight text-white">
-            OpenClone.ai
-          </span>
-        </div>
-        <button className="p-2 hover:bg-white/5 rounded-lg transition-colors text-zinc-400 hover:text-white">
-          <Plus size={18} />
-        </button>
-      </header>
+    <div className="flex flex-col h-full overflow-hidden bg-zinc-950 border-r border-white/5">
 
       {/* Chat Area */}
       <div className="flex-1 overflow-y-auto p-4 space-y-6 custom-scrollbar">
@@ -210,7 +200,7 @@ const Chat = ({ chatWidth, projectId, isAuthor }: ChatProps) => {
               </div>
             ))}
 
-            {isAiGenerating && (
+            {isAiGenerating || isAiProcessing && (
               <div className="flex gap-3 animate-pulse">
                 <div className="w-8 h-8 rounded-lg bg-zinc-900 border border-white/10 flex items-center justify-center">
                   <Sparkles size={14} className="text-indigo-400" />
@@ -237,10 +227,10 @@ const Chat = ({ chatWidth, projectId, isAuthor }: ChatProps) => {
           />
           <button
             onClick={handleSendMessage}
-            disabled={!chatInput.trim() || isAiGenerating}
+            disabled={!chatInput.trim() || isAiGenerating || isAiProcessing}
             className={`absolute right-2 bottom-2 p-2 rounded-lg transition-all active:scale-95 
               ${
-                !chatInput.trim() || isAiGenerating
+                !chatInput.trim() || isAiGenerating || isAiProcessing
                   ? "text-zinc-600 cursor-not-allowed"
                   : "text-white bg-indigo-600 hover:bg-indigo-500"
               }`}

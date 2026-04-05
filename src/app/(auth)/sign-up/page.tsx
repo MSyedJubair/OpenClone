@@ -1,7 +1,6 @@
 "use client";
 
 import { useState } from "react";
-import AuthLayout from "@/components/AuthLayout";
 import { authClient } from "@/lib/auth-client";
 import { toast } from "sonner";
 import { useRouter } from "next/navigation";
@@ -125,7 +124,6 @@ export default function SignUp() {
   // </form>;
 
   return (
-    <AuthLayout>
       <div className="w-full max-w-md mx-auto">
         <div className="bg-app-surface/40 backdrop-blur-2xl border border-white/5 rounded-3xl p-8 shadow-[0_20px_50px_rgba(0,0,0,0.5)]">
           {/* Header */}
@@ -176,6 +174,5 @@ export default function SignUp() {
           </p>
         </div>
       </div>
-    </AuthLayout>
   );
 }
